@@ -20,7 +20,23 @@ class Settings(BaseSettings):
     PORT: int = 8000
 
     # ── CORS ─────────────────────────────────────────────
-    CORS_ORIGINS: list[str] = ["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"]
+    # Environment variable can be "*", comma-separated string, or JSON array string
+    CORS_ORIGINS: str = "*"
+
+    @property
+    def cors_origins_list(self) -> list[str]:
+        raw = (self.CORS_ORIGINS or "").strip()
+        if not raw or raw == "*":
+            return ["*"]
+        if raw.startswith("[") and raw.endswith("]"):
+            try:
+                import json
+                parsed = json.loads(raw)
+                if isinstance(parsed, list):
+                    return [str(x).strip() for x in parsed]
+            except Exception:
+                pass
+        return [o.strip() for o in raw.split(",") if o.strip()]
 
     # ── Input limits ─────────────────────────────────────
     MAX_TEXT_LENGTH: int = 2000
