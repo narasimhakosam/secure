@@ -24,12 +24,7 @@ def create_app() -> FastAPI:
     )
 
     # ── CORS ─────────────────────────────────────────────
-    raw_origins = settings.CORS_ORIGINS
-    if isinstance(raw_origins, str):
-        cors_origins = [o.strip() for o in raw_origins.split(",") if o.strip()]
-    else:
-        cors_origins = list(raw_origins)
-
+    cors_origins = settings.cors_origins_list
     has_wildcard = "*" in cors_origins
 
     app.add_middleware(
